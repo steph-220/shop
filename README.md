@@ -20,3 +20,15 @@ Even if JWT is stolen password would not be exposed, and attacker could only use
 
 All above in Spring Boot could be achieved with extending AuthorizationServerConfigurerAdapter, ResourceServerConfigurerAdapter and WebSecurityConfigurerAdapter.
 
+
+Proposal for redundancy:
+Application should be distributed, if any machine unexpectedly fails, other can serve clients.
+One example would be to use ASG on AWS across few availability zones, so even in case of data center outage application would continue to work.
+Healthchecks should also be added so failed services could be replaced, and app could be scaled using memory, cpu etc. usages across instances.
+Deployment strategy could be either blue-green or rolling update, so when app is deployed clients won't have downtime.
+Before every deployment app should pass through one or more testing environments and as a result there is less chance for bugs/errors.
+If there are lots of orders app could be divided in product and order services, and between them queue could be added, so order service could act as a consumer for orders, and even in case of failure or slower execution order service could catch up with client orders.
+
+DB should be separated from app, and should also be distributed.
+As online shop is more read heavy type of service, one way would be to use read-replication, having one master node, and n replicas.
+If shop start to gain a lot of customers and new product, sharding should also be considered or moving away from SQL db to leaderless db architecture (Dynamo like dbs).
