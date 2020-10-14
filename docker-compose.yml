@@ -1,0 +1,34 @@
+version: '3.7'
+
+services:
+  db-service:
+    restart: always
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=shop
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=password
+    ports:
+      - 7306:3306
+
+  web-service:
+    image: maven:3.6.3-jdk-11
+    working_dir: /shop
+    restart: on-failure
+    depends_on:
+      - db-service
+    ports:
+      - 8089:8080
+    expose:
+      - "8089"
+    environment:
+      - DATABASE_HOST=shop
+      - DATABASE_USER=admin
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=shop
+      - DATABASE_PORT=6306
+    volumes:
+      - ./:/shop
+      - ~/.m2:/root/.m2
+    command: mvn clean spring-boot:run
